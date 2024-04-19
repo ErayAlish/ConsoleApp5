@@ -5,7 +5,7 @@ using Fitnessapp;
 using static ConsoleApp5.Daten.FitnessDbContext;
 
 
-
+ 
 // Benutzerdaten abfragen
 Console.WriteLine("Willkommen bei der Fitness-App!");
 Console.Write("Geben Sie Ihren Namen ein: ");
