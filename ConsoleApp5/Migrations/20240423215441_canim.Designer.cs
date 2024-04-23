@@ -10,15 +10,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ConsoleApp5.Migrations
 {
     [DbContext(typeof(FitnessDbContext.FitnessContext))]
-    [Migration("20240411102018_F1")]
-    partial class F1
+    [Migration("20240423215441_canim")]
+    partial class canim
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.0");
 
-            modelBuilder.Entity("Fitnessapp.Model.DietPlan", b =>
+            modelBuilder.Entity("ConsoleApp5.Model.Ernährung.DietPlan", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,7 +38,7 @@ namespace ConsoleApp5.Migrations
                     b.ToTable("DietPlans");
                 });
 
-            modelBuilder.Entity("Fitnessapp.Model.Meal", b =>
+            modelBuilder.Entity("ConsoleApp5.Model.Ernährung.Meal", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -61,6 +61,56 @@ namespace ConsoleApp5.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Meals");
+                });
+
+            modelBuilder.Entity("ConsoleApp5.Model.WorkoutPlan.Aktivitäten", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Dauer")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Typ")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Wdh")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("WdhPS")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Aktivitäts");
+                });
+
+            modelBuilder.Entity("ConsoleApp5.Model.WorkoutPlan.TrainingsPlan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Dauer")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("UserID")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TrainingsPlans");
                 });
 
             modelBuilder.Entity("Fitnessapp.Model.User", b =>

@@ -1,4 +1,6 @@
-﻿using Fitnessapp.Model;
+﻿using ConsoleApp5.Model.Ernährung;
+using ConsoleApp5.Model.WorkoutPlan;
+using Fitnessapp.Model;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,12 +20,20 @@ namespace ConsoleApp5.Daten
 
             public DbSet<Meal> Meals { get; set; }
 
+            public DbSet<Aktivitäten> Aktivitäts { get; set; }
+
+            public DbSet<TrainingsPlan> TrainingsPlans { get; set; } 
+
+
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
                 // Definieren von Primärschlüsseln füfr jede Entität
                 modelBuilder.Entity<User>().HasKey(u => u.Id);
                 modelBuilder.Entity<DietPlan>().HasKey(d => d.Id);
                 modelBuilder.Entity<Meal>().HasKey(m => m.Id);
+                modelBuilder.Entity<Aktivitäten>().HasKey(a => a.Id);
+                modelBuilder.Entity<TrainingsPlan>().HasKey(t => t.Id);
+
 
                 // Immer die Basis-Methode aufrufen, um das Basisverhalten einzuschließen
                 base.OnModelCreating(modelBuilder);

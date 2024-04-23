@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace Fitnessapp.Model
 {
-    // Klasse, die die Datenbankentitäten für den Benutzer repräsentiert
     public class User
     {
         public int Id { get; set; }

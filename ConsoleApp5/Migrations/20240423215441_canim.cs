@@ -4,10 +4,27 @@
 
 namespace ConsoleApp5.Migrations
 {
-    public partial class F1 : Migration
+    public partial class canim : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Aktivitäts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Wdh = table.Column<int>(type: "INTEGER", nullable: false),
+                    WdhPS = table.Column<int>(type: "INTEGER", nullable: false),
+                    Dauer = table.Column<int>(type: "INTEGER", nullable: false),
+                    Typ = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Aktivitäts", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "DietPlans",
                 columns: table => new
@@ -40,6 +57,21 @@ namespace ConsoleApp5.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TrainingsPlans",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UserID = table.Column<int>(type: "INTEGER", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Dauer = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrainingsPlans", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -62,10 +94,16 @@ namespace ConsoleApp5.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Aktivitäts");
+
+            migrationBuilder.DropTable(
                 name: "DietPlans");
 
             migrationBuilder.DropTable(
                 name: "Meals");
+
+            migrationBuilder.DropTable(
+                name: "TrainingsPlans");
 
             migrationBuilder.DropTable(
                 name: "Users");
