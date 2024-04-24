@@ -48,24 +48,48 @@ namespace FitnessApp
             Console.WriteLine("\n--- Neue Registrierung ---");
             Console.Write("Geben Sie Ihren Namen ein: ");
             string name = Console.ReadLine();
+            Console.Clear();
+
+            Console.Write("Geben Sie Ihr Passwort ein: ");
+            string password = GetPassword();
+            Console.Clear();
+
+            Console.Write("Geben Sie Ihr Geschlecht ein (Männlich = 'M', Weiblich = 'W'): ");
+            char gender = char.Parse(Console.ReadLine().ToUpper());
+            Console.Clear();
 
             Console.Write("Geben Sie Ihr Gewicht in kg ein: ");
             double weight = double.Parse(Console.ReadLine());
+            Console.Clear();
 
             Console.Write("Geben Sie Ihr Alter ein: ");
             int age = int.Parse(Console.ReadLine());
+            Console.Clear();
 
             Console.Write("Geben Sie Ihre Größe in cm ein: ");
             double height = double.Parse(Console.ReadLine());
+            Console.Clear();
 
             Console.Write("Möchten Sie abnehmen oder zunehmen? (abnehmen/zunehmen): ");
             string goal = Console.ReadLine();
+            Console.Clear();
 
             Console.Write("An wie vielen Tagen können Sie pro Woche trainieren? ");
             int trainingDays = int.Parse(Console.ReadLine());
+            Console.Clear();
 
             Console.Write("Wie viele Stunden können Sie pro Tag im Fitnessstudio verbringen? ");
             double trainingHoursPerDay = double.Parse(Console.ReadLine());
+
+            Console.Clear();
+            Console.WriteLine("\nGeben Sie Ihre tägliche Aktivität ein:");
+            Console.WriteLine("0,2 - Liegend");
+            Console.WriteLine("0,4 - Sitzend");
+            Console.WriteLine("0,6 - Stehend");
+            Console.WriteLine("0,8 - Stehend/Gehend");
+            Console.WriteLine("1,0 - Körperlich hart arbeitend");
+            Console.Write("Bitte geben Sie den Wert ein: ");
+            double dailyActivity = double.Parse(Console.ReadLine());
 
             using (var db = new FitnessContext())
             {
@@ -75,17 +99,20 @@ namespace FitnessApp
                     Weight = weight,
                     Age = age,
                     Height = height,
+                    Gender = gender,
+                    DailyActivity = dailyActivity,
                     Goal = goal,
                     TrainingDays = trainingDays,
-                    TrainingHoursPerDay = trainingHoursPerDay
+                    TrainingHoursPerDay = trainingHoursPerDay,
+
                 };
 
-                db.Users.Add(user);
+                db.Users.Add(user); 
                 db.SaveChanges();
 
                 Console.WriteLine("Benutzer erfolgreich registriert!");
 
-                // Ernährungsplan generieren
+                ///Ernährungsplan generieren
                 // GenerateDietPlan(user, db);
 
                 Console.Clear();
@@ -260,6 +287,52 @@ namespace FitnessApp
                new Meal { Name = "Karottensticks mit Hummus", Calories = 150, Proteins = 5, TimeOfDay = "Snack" },
                new Meal { Name = "Mandeln und getrocknete Früchte", Calories = 250, Proteins = 10, TimeOfDay = "Snack" }
             };
+
+            // Berechnung des täglichen Kalorienbedarfs basierend auf Geschlecht, Aktivität und Ziel
+            double bmr;
+            if (user.Gender == 'M')
+            {
+                bmr = 66.5 + (13.7 * user.Weight) + (5.0 * user.Height) - (6.8 * user.Age);
+            }
+            else // Weiblich
+            {
+                bmr = 655 + (9.6 * user.Weight) + (1.8 * user.Height) - (4.7 * user.Age);
+            }
+
+            double calorieMultiplier = 1.0;
+            if (user.DailyActivity == 0.2)
+            {
+                calorieMultiplier = 1.2;
+            }
+            else if (user.DailyActivity == 0.4)
+            {
+                calorieMultiplier = 1.4;
+            }
+            else if (user.DailyActivity == 0.6)
+            {
+                calorieMultiplier = 1.6;
+            }
+            else if (user.DailyActivity == 0.8)
+            {
+                calorieMultiplier = 1.8;
+            }
+            else if (user.DailyActivity == 1.0)
+            {
+                calorieMultiplier = 2.0;
+            }
+
+            double maintenanceCalories = bmr * calorieMultiplier;
+
+            if (user.Goal == "abnehmen")
+            {
+                maintenanceCalories -= 150; // Kalorienreduktion für Gewichtsverlust
+            }
+            else if (user.Goal == "zunehmen")
+            {
+                maintenanceCalories += 250; // Kalorienzufuhr für Gewichtszunahme
+            }
+
+           
 
             // Ernährungsplan speichern
             var dietPlan = new DietPlan
