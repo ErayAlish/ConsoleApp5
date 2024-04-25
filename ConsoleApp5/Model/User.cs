@@ -15,7 +15,7 @@ namespace Fitnessapp.Model
         public string Name { get; set; }
 
         [Required]
-        private string Password { get; set; }
+        public string Password { get; set; }
 
         [Required]
         public double Weight { get; set; }

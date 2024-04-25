@@ -143,6 +143,10 @@ namespace ConsoleApp5.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("TrainingDays")
                         .HasColumnType("INTEGER");
 

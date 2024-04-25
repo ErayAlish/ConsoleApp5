@@ -7,21 +7,24 @@ using static ConsoleApp5.Daten.FitnessDbContext;
 using ConsoleApp5.Model.WorkoutPlan;
 using Microsoft.Exchange.WebServices.Data;
 using ConsoleApp5.Daten;
+using Microsoft.EntityFrameworkCore;
 
 namespace FitnessApp
 {
     class Program
     {
 
-        
+
         static void Main(string[] args)
         {
             while (true)
             {
                 Console.WriteLine("Willkommen bei der Fitness-App!");
-                Console.WriteLine("1. Neue Registrierung");
-                Console.WriteLine("2. Alle Registrierungen anzeigen");
-                Console.WriteLine("3. Beenden");
+                Console.WriteLine("1. Anmeldung");
+                Console.WriteLine("2. Neue Registrierung");
+                Console.WriteLine("3. Alle Registrierungen anzeigen");
+                Console.WriteLine("4. Passwort ändern");
+                Console.WriteLine("5. Beenden");
                 Console.Write("Bitte wählen Sie eine Option: ");
 
                 string option = Console.ReadLine();
@@ -29,12 +32,18 @@ namespace FitnessApp
                 switch (option)
                 {
                     case "1":
-                        RegisterUser();
+                        Login();
                         break;
                     case "2":
-                        ShowAllUsers();
+                        RegisterUser();
                         break;
                     case "3":
+                        ShowAllUsers();
+                        break;
+                    case "4":
+                        ChangePassword();
+                        break;
+                    case "5":
                         return;
                     default:
                         Console.WriteLine("Ungültige Option. Bitte wählen Sie eine gültige Option aus.");
@@ -107,35 +116,39 @@ namespace FitnessApp
 
                 };
 
-                db.Users.Add(user); 
+                db.Users.Add(user);
                 db.SaveChanges();
 
                 Console.WriteLine("Benutzer erfolgreich registriert!");
+                Bmenu(user, db);
 
                 ///Ernährungsplan generieren
                 // GenerateDietPlan(user, db);
 
-                Console.Clear();
-                Console.WriteLine("1. Trainingsplan erstellen");
-                Console.WriteLine("2. Ernährungsplan erstellen");
-                string option2 = Console.ReadLine();
-                switch (option2)
-                {
-
-                    case "1":
-                        CreateWorkoutPlan(user, db);
-                        break;
-                    case "2":
-                        GenerateDietPlan(user, db);
-                        break;
-
-                }
-
 
             }
         }
-       
-       
+
+        static void Bmenu(User user, FitnessContext db)
+        {
+            Console.Clear();
+            Console.WriteLine("1. Trainingsplan erstellen");
+            Console.WriteLine("2. Ernährungsplan erstellen");
+            string option2 = Console.ReadLine();
+            switch (option2)
+            {
+
+                case "1":
+                    CreateWorkoutPlan(user, db);
+                    break;
+                case "2":
+                    GenerateDietPlan(user, db);
+                    break;
+
+            }
+        }
+
+
         static void CreateWorkoutPlan(User user, FitnessContext db)
         {
 
@@ -150,7 +163,7 @@ namespace FitnessApp
             else
             {
                 // Split-Trainingsplan für 4 oder mehr Trainingstage pro Woche
-                // CreateSplitWorkout(trainingPlan, user.TrainingHoursPerDay, db);
+                CreateSplitWorkout(trainingPlan, user.TrainingHoursPerDay, db);
             }
 
             db.TrainingsPlans.Add(trainingPlan);
@@ -228,7 +241,7 @@ namespace FitnessApp
                         selectedActivities.Add(activity);
                         totalDuration += duration;
                     }
-                    
+
                 }
             }
 
@@ -256,17 +269,47 @@ namespace FitnessApp
         }
 
 
-        static void CreateSplitWorkout(TrainingsPlan workoutPlan, double trainingHoursPerDay, FitnessContext db)
+        static void CreateSplitWorkout(TrainingsPlan trainingsPlan, double trainingHoursPerDay, FitnessContext db)
         {
-            workoutPlan.Name = "Split Trainingsplan";
+            trainingsPlan.Name = "Split Trainingsplan";
 
-            // Übungen für Split-Training
-            var exercises = new List<Aktivitäten>
+            var days = new string[] { "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag" };
+
+            // Übungen für den Split-Trainingsplan
+            var exercises = new Dictionary<string, List<Aktivitäten>>
             {
-                // Push Day
-              //  new Aktivitäten { Name = "Bankdrücken mit Kurzhanteln", Dauer = "25 Minuten", Typ = "Brust" },
+                { "Montag", new List<Aktivitäten> { /* Übungen für Montag */ } },
+                { "Dienstag", new List<Aktivitäten> { /* Übungen für Dienstag */ } },
+                { "Mittwoch", new List<Aktivitäten> { /* Übungen für Mittwoch */ } },
+                { "Donnerstag", new List<Aktivitäten> { /* Übungen für Donnerstag */ } },
+                { "Freitag", new List<Aktivitäten> { /* Übungen für Freitag */ } },
+                { "Samstag", new List<Aktivitäten> { /* Übungen für Samstag */ } },
+                { "Sonntag", new List<Aktivitäten> { } } // Sonntag ist ein Ruhetag
             };
+
+            // Aktivitäten hinzufügen, je nach Anzahl der Trainingstage des Benutzers
+            var trainingDays = trainingsPlan.trainingdays;
+            for (int i = 0; i < Math.Min(trainingDays, days.Length); i++)
+            {
+                var day = days[i];
+                trainingsPlan.Aktivitäten.AddRange(exercises[day]);
+            }
+
+            db.TrainingsPlans.Add(trainingsPlan);
+            db.SaveChanges();
+
+            Console.Clear();
+            Console.WriteLine("\n--- Erstellter Trainingsplan ---");
+            Console.WriteLine($"Name: {trainingsPlan.Name}");
+            Console.WriteLine($"Benutzer ID: {trainingsPlan.UserID}");
+            Console.WriteLine("Aktivitäten:");
+            foreach (var activity in trainingsPlan.Aktivitäten)
+            {
+                Console.WriteLine($"- {activity.Name}, Dauer: {activity.Dauer}, Wiederholungen: {activity.Wdh}, Wiederholungen pro Satz: {activity.WdhPS}, Typ: {activity.Typ}");
+            }
+            Console.ReadKey();
         }
+    
 
 
         static void GenerateDietPlan(User user, FitnessContext db)
@@ -332,7 +375,7 @@ namespace FitnessApp
                 maintenanceCalories += 250; // Kalorienzufuhr für Gewichtszunahme
             }
 
-           
+
 
             // Ernährungsplan speichern
             var dietPlan = new DietPlan
@@ -391,6 +434,8 @@ namespace FitnessApp
                 }
             }
         }
+
+
         static string GetPassword()
         {
             string password = "";
@@ -409,6 +454,70 @@ namespace FitnessApp
 
             return password;
         }
-    } 
+
+        static void Login()
+        {
+            Console.WriteLine("\n--- Anmeldung ---");
+            Console.Write("Benutzername: ");
+            string username = Console.ReadLine();
+            Console.Write("Passwort: ");
+            string password = GetPassword();
+
+            using (var db = new FitnessContext())
+            {
+                var user = db.Users.FirstOrDefault(u => u.Name == username && u.Password == password);
+                if (user != null)
+                {
+                    Console.WriteLine($"Anmeldung erfolgreich! Willkommen, {user.Name}!");
+                    Bmenu(user, db);
+                }
+                else
+                {
+                    Console.WriteLine("Anmeldung fehlgeschlagen. Benutzername oder Passwort ungültig.");
+                    Console.ReadKey ();
+                }
+            }
+
+        }
+
+        static void ChangePassword()
+        {
+            Console.WriteLine("\n--- Passwort ändern ---");
+            Console.Write("Benutzername: ");
+            string username = Console.ReadLine();
+            Console.Write("Aktuelles Passwort: ");
+            string currentPassword = GetPassword();
+
+            using (var db = new FitnessContext())
+            {
+                var user = db.Users.FirstOrDefault(u => u.Name == username && u.Password == currentPassword);
+                if (user != null)
+                {
+                    Console.Write("Neues Passwort: ");
+                    string newPassword1 = GetPassword();
+                    Console.Write("Neues Passwort bestätigen: ");
+                    string newPassword2 = GetPassword();
+
+                    if (newPassword1 == newPassword2)
+                    {
+                        user.Password = newPassword1;
+                        db.SaveChanges();
+                        Console.WriteLine("Passwort erfolgreich geändert!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Die neuen Passwörter stimmen nicht überein. Bitte versuchen Sie es erneut.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Benutzername oder aktuelles Passwort ungültig. Passwortänderung fehlgeschlagen.");
+                }
+            }
+
+        }
+
+
+    }
 }
 
